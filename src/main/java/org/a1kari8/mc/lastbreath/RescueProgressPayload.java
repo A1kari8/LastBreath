@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.a1kari8.mc.lastbreath.network.RescueState;
 import org.jetbrains.annotations.NotNull;
 
-public record RescueProgressPayload(float progress,
+public record RescueProgressPayload(
                                     RescueState rescueState) implements CustomPacketPayload {
     public static final Type<RescueProgressPayload> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(LastBreath.MODID, "rescue_progress"));
@@ -41,7 +41,7 @@ public record RescueProgressPayload(float progress,
     public static final StreamCodec<ByteBuf, RescueProgressPayload> CODEC =
             StreamCodec.composite(
 //                    UUID_CODEC, RescueProgressPayload::playerId,
-                    ByteBufCodecs.FLOAT, RescueProgressPayload::progress,
+//                    ByteBufCodecs.FLOAT, RescueProgressPayload::progress,
                     STATE_CODEC, RescueProgressPayload::rescueState,
                     RescueProgressPayload::new
             );

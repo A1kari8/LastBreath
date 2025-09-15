@@ -14,15 +14,15 @@ public class PayloadHandler {
             }
             case RESCUING -> {
                 // 正在救援
-                ClientRescueManager.update(data.progress(), data.rescueState());
+                ClientRescueManager.update(data.rescueState());
             }
             case COMPLETED -> {
                 // 救援完成
-                ClientRescueManager.update(data.progress(), data.rescueState());
+                ClientRescueManager.complete();
             }
             case CANCELLED -> {
                 // 被取消
-                ClientRescueManager.update(data.progress(), data.rescueState());
+                ClientRescueManager.cancel();
             }
         }
     }

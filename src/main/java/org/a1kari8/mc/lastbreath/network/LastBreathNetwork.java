@@ -14,7 +14,7 @@ public class LastBreathNetwork {
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar("1"); // 协议版本号
 
-        registrar.playBidirectional(
+        registrar.playToClient(
                 RescueProgressPayload.TYPE,
                 RescueProgressPayload.CODEC,
                 PayloadHandler::handleDataOnMain

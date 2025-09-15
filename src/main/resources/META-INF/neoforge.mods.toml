@@ -92,9 +92,9 @@ config="${mod_id}.mixins.json"
 #[features.${mod_id}]
 #openGLVersion="[3.2,)"
 
-[[dependencies.${mod_id}]]
-modId = "geckolib"
-mandatory = true
-versionRange = "[4.7.7,5.0.0)"
-ordering = "AFTER"
-side = "BOTH"
+#[[dependencies.${mod_id}]]
+#modId = "geckolib"
+#mandatory = true
+#versionRange = "[4.7.7,5.0.0)"
+#ordering = "AFTER"
+#side = "BOTH"
