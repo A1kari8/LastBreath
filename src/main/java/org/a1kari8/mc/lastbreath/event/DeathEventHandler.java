@@ -1,4 +1,4 @@
-package org.a1kari8.mc.lastbreath;
+package org.a1kari8.mc.lastbreath.event;
 
 
 import net.minecraft.world.effect.MobEffectInstance;
@@ -8,6 +8,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import org.a1kari8.mc.lastbreath.LastBreath;
 
 import static org.a1kari8.mc.lastbreath.LastBreath.MODID;
 
@@ -19,7 +20,7 @@ public class DeathEventHandler {
         if (!(event.getEntity() instanceof Player player)) return;
         if (player.level().isClientSide) return;
 
-        // 如果已经濒死过一次，就允许死亡
+        // 如果已经濒死，就允许死亡
         if (player.getPersistentData().getBoolean("Dying")) return;
 
         // 阻止死亡
@@ -27,7 +28,7 @@ public class DeathEventHandler {
 
         // 设置濒死状态
         player.getPersistentData().putBoolean("Dying", true);
-        player.setForcedPose(Pose.SLEEPING);
+        player.setForcedPose(Pose.SWIMMING);
         player.setHealth(10.0F);
         player.addEffect(new MobEffectInstance(LastBreath.DYING_MOB_EFFECT, Integer.MAX_VALUE, 0, false, false));
     }

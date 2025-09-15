@@ -1,10 +1,6 @@
 package org.a1kari8.mc.lastbreath;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.ModConfigSpec;
-
-import java.util.List;
 
 // An example config class. This is not required, but it's a good idea to have one to keep your config organized.
 // Demonstrates how to use Neo's config APIs
@@ -58,7 +54,6 @@ public class Config {
 //    public static final ModConfigSpec.DoubleValue HEALTH_AFTER_REVIVE = BUILDER
 //            .comment("Health percentage restored after being revived (0.0 to 1.0)")
 //            .defineInRange("healthAfterRevive", 0.5, 0.1, 1.0);
-
 
 
 //    private static boolean validateItemName(final Object obj) {

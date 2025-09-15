@@ -1,4 +1,4 @@
-package org.a1kari8.mc.lastbreath;
+package org.a1kari8.mc.lastbreath.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

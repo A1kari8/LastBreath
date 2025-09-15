@@ -1,11 +1,10 @@
-package org.a1kari8.mc.lastbreath;
+package org.a1kari8.mc.lastbreath.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import org.a1kari8.mc.lastbreath.network.RescueState;
+import org.a1kari8.mc.lastbreath.LastBreath;
 import org.jetbrains.annotations.NotNull;
 
 public record RescueProgressPayload(

@@ -5,7 +5,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.a1kari8.mc.lastbreath.LastBreath;
-import org.a1kari8.mc.lastbreath.RescueProgressPayload;
 
 @EventBusSubscriber(modid = LastBreath.MODID)
 public class LastBreathNetwork {
