@@ -1,13 +1,15 @@
 package org.a1kari8.mc.lastbreath.event;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
+import net.minecraft.world.item.TridentItem;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
@@ -15,13 +17,12 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.a1kari8.mc.lastbreath.LastBreath;
+import org.a1kari8.mc.lastbreath.ServerConfig;
 import org.a1kari8.mc.lastbreath.ServerRescueManager;
+import org.a1kari8.mc.lastbreath.network.RescueState;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
 import org.a1kari8.mc.lastbreath.network.payload.RescueStatePayload;
-import org.a1kari8.mc.lastbreath.network.RescueState;
 
-import static org.a1kari8.mc.lastbreath.LastBreath.LOGGER;
 import static org.a1kari8.mc.lastbreath.LastBreath.MODID;
 
 @EventBusSubscriber(modid = MODID)
@@ -43,7 +44,6 @@ public class RescueEventHandler {
             if (!rescuer.isCrouching()) {
                 // 如果施救者没有蹲下
                 if (isRescuing) {
-                    LOGGER.info("not crouching, cancel rescuing");
                     // 如果当前正在救援中，则取消救援
                     ServerRescueManager.cancelRescuing(rescuer);
                     // 向客户端发送取消救援的消息
@@ -54,7 +54,6 @@ public class RescueEventHandler {
                 return;
             }
             if (!isRescuing) {
-                LOGGER.info("start rescuing");
                 // 开始救援
                 ServerRescueManager.startRescue(rescuer,target);
                 // 向客户端发送开始救援的消息
@@ -65,32 +64,36 @@ public class RescueEventHandler {
 
             // 更新救援进度
             ServerRescueManager.updateRescue(rescuer, target);
-            LOGGER.info("update rescuing");
             if (ServerRescueManager.isBeingRescuedComplete(target) || ServerRescueManager.isRescuingComplete(rescuer)) {
-                LOGGER.info("complete rescuing");
                 // 判断救援是否完成
                 ServerRescueManager.completeBeingRescued(target);
                 // 向客户端发送救援完成的消息
                 PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload(RescueState.COMPLETE));
                 PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload( RescueState.COMPLETE));
 
-                // 移除濒死状态
-//                target.removeEffect(LastBreath.DYING_MOB_EFFECT);
-                AttributeInstance movementSpeed = target.getAttribute(Attributes.MOVEMENT_SPEED);
-                if (movementSpeed != null) {
-                    movementSpeed.setBaseValue(0.1); // 默认是 0.1
-                }
-                target.setHealth(6.0F);
-                target.getPersistentData().putBoolean("Dying", false);
-                target.setForcedPose(null);
-                PacketDistributor.sendToPlayer(serverTarget, new DyingStatePayload(false));
-                event.getLevel().playSound(null, target.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.0F);
-//                rescuer.sendSystemMessage(Component.literal("你成功救援了 " + target.getName().getString()));
-//                target.sendSystemMessage(Component.literal("你被 " + rescuer.getName().getString() + " 救援了！"));
+                rescuePlayer(serverTarget, (float) ServerConfig.RESCUE_HEALTH.getAsDouble());
                 event.setCanceled(true);
             }
         }
     }
+
+    public static void rescuePlayer(ServerPlayer serverTarget, float healthAfterRescue) {
+        // 移除濒死状态
+//                target.removeEffect(LastBreath.DYING_MOB_EFFECT);
+        AttributeInstance movementSpeed = serverTarget.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (movementSpeed != null) {
+            movementSpeed.setBaseValue(0.1); // 默认是 0.1
+        }
+        serverTarget.setHealth(healthAfterRescue);
+        serverTarget.getPersistentData().putBoolean("Dying", false);
+        serverTarget.getPersistentData().putBoolean("Bleeding", false);
+        serverTarget.setForcedPose(null);
+        PacketDistributor.sendToPlayer(serverTarget, new DyingStatePayload(false));
+        serverTarget.level().playSound(null, serverTarget.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.0F);
+//                rescuer.sendSystemMessage(Component.literal("你成功救援了 " + target.getName().getString()));
+//                target.sendSystemMessage(Component.literal("你被 " + rescuer.getName().getString() + " 救援了！"));
+    }
+
 
     /**
      * 判断施救玩家是否松开右键
@@ -103,12 +106,19 @@ public class RescueEventHandler {
             // 正在救援中
             if (ServerRescueManager.isRescuing(player)) {
                 if (ServerRescueManager.isRightClickReleased(player)) {
-                    LOGGER.info("right click released, cancel rescuing");
                     // 向客户端发送取消救援的消息
                     PacketDistributor.sendToPlayer(ServerRescueManager.getTarget(serverPlayer), new RescueStatePayload( RescueState.CANCEL));
                     PacketDistributor.sendToPlayer(serverPlayer, new RescueStatePayload( RescueState.CANCEL));
                     // 判断右键松开则取消救援
                     ServerRescueManager.cancelRescuing(serverPlayer);
+                    return;
+                }
+            }
+            if (player.getPersistentData().getBoolean("Dying") && player.getPersistentData().getBoolean("Bleeding") && ServerConfig.BLEEDING_DURATION.getAsInt() > 0 && !ServerRescueManager.isBeingRescued(player)) {
+                // 如果濒死玩家没有被救援且开启流血配置项，则流血
+                if (player.tickCount % 20 == 0) {
+                    float currentHealth = player.getHealth();
+                    player.setHealth(currentHealth - currentHealth / ServerConfig.BLEEDING_DURATION.getAsInt());
                 }
             }
         }

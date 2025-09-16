@@ -18,17 +18,17 @@ group = mod_group_id
 
 repositories {
     // Add here additional repositories if required by some of the dependencies below.
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = 'GeckoLib'
-                url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
-            }
-        }
-        filter {
-            includeGroup('software.bernie.geckolib')
-        }
-    }
+//    exclusiveContent {
+//        forRepository {
+//            maven {
+//                name = 'GeckoLib'
+//                url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+//            }
+//        }
+//        filter {
+//            includeGroup('software.bernie.geckolib')
+//        }
+//    }
 }
 
 base {

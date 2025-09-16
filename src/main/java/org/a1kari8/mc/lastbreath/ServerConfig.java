@@ -9,7 +9,23 @@ public class ServerConfig {
 
     public static final ModConfigSpec.IntValue RESCUE_DURATION_MILLISECOND = BUILDER
             .comment("Duration in millisecond for the rescue action")
+            .translation("lastbreath.config.rescue_duration")
             .defineInRange("rescueDuration", 3000, 1, Short.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue BLEEDING_DURATION = BUILDER
+            .comment("Duration in second for the bleeding until death (-1 means no bleeding)")
+            .translation("lastbreath.config.bleeding_duration")
+            .defineInRange("bleedingDuration", 600, -1, Short.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue DYING_HEALTH = BUILDER
+            .comment("Health value when a player enters dying state")
+            .translation("lastbreath.config.dying_health")
+            .defineInRange("dyingHealth", 10.0, 1.0, 20.0);
+
+    public static final ModConfigSpec.DoubleValue RESCUE_HEALTH = BUILDER
+            .comment("Health value after a player is rescued")
+            .translation("lastbreath.config.rescue_health")
+            .defineInRange("rescueHealth", 6.0, 1.0, 20.0);
 
     // 该条必须放在最后
     public static final ModConfigSpec SPEC = BUILDER.build();

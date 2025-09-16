@@ -2,7 +2,6 @@ package org.a1kari8.mc.lastbreath.event;
 
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -12,7 +11,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.a1kari8.mc.lastbreath.LastBreath;
+import org.a1kari8.mc.lastbreath.ServerConfig;
 import org.a1kari8.mc.lastbreath.ServerRescueManager;
 import org.a1kari8.mc.lastbreath.network.RescueState;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
@@ -43,16 +42,22 @@ public class DeathEventHandler {
         event.setCanceled(true);
 
         // 设置濒死状态
+        setDying(player, (float) ServerConfig.DYING_HEALTH.getAsDouble());
+//        player.addEffect(new MobEffectInstance(LastBreath.DYING_MOB_EFFECT, Integer.MAX_VALUE, 0, false, false));
+    }
+
+    public static void setDying(Player player, float dyingHealth) {
+        // 设置濒死状态
         player.getPersistentData().putBoolean("Dying", true);
+        player.getPersistentData().putBoolean("Bleeding", true);
         player.setForcedPose(Pose.SWIMMING);
         if (player instanceof ServerPlayer serverPlayer) {
             PacketDistributor.sendToPlayer(serverPlayer, new DyingStatePayload(true));
         }
-        player.setHealth(10.0F);
+        player.setHealth(dyingHealth);
         AttributeInstance movementSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED);
         if (movementSpeed != null) {
             movementSpeed.setBaseValue(0.04); // 默认是 0.1
         }
-//        player.addEffect(new MobEffectInstance(LastBreath.DYING_MOB_EFFECT, Integer.MAX_VALUE, 0, false, false));
     }
 }

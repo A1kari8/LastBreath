@@ -1,7 +1,6 @@
 package org.a1kari8.mc.lastbreath.client;
 
 import net.minecraft.client.Minecraft;
-import org.a1kari8.mc.lastbreath.LastBreath;
 import org.a1kari8.mc.lastbreath.ServerRescueManager;
 import org.a1kari8.mc.lastbreath.network.RescueState;
 
