@@ -35,18 +35,13 @@ public class LastBreath {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
     // Creates a creative tab for the mod
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> LASTBREATH_TAB = CREATIVE_MODE_TABS.register("lastbreath_tab", () -> CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.lastbreath"))
-            .withTabsBefore(CreativeModeTabs.COMBAT)
-            .icon(Items.TOTEM_OF_UNDYING::getDefaultInstance)
-            .displayItems((parameters, output) -> {
-                // 可以在这里添加mod相关的物品
-            }).build());
-
-    public static final DeferredRegister<MobEffect> MOB_EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, MODID);
-    public static final Holder<MobEffect> DYING_MOB_EFFECT = MOB_EFFECTS.register("dying_mob_effect", () -> new DyingMobEffect()
-            .addAttributeModifier(Attributes.MOVEMENT_SPEED, ResourceLocation.fromNamespaceAndPath(MODID, "dying_speed"), -0.9, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
-    );
+//    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> LASTBREATH_TAB = CREATIVE_MODE_TABS.register("lastbreath_tab", () -> CreativeModeTab.builder()
+//            .title(Component.translatable("itemGroup.lastbreath"))
+//            .withTabsBefore(CreativeModeTabs.COMBAT)
+//            .icon(Items.TOTEM_OF_UNDYING::getDefaultInstance)
+//            .displayItems((parameters, output) -> {
+//                // 可以在这里添加mod相关的物品
+//            }).build());
 
     public LastBreath(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
@@ -59,8 +54,7 @@ public class LastBreath {
         NeoForge.EVENT_BUS.register(this);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
-        modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
-        MOB_EFFECTS.register(modEventBus);
+        modContainer.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
 
     }
 

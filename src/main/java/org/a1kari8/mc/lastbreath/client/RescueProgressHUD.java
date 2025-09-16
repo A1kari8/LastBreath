@@ -28,21 +28,21 @@ public class RescueProgressHUD {
         int screenWidth = mc.getWindow().getGuiScaledWidth();
         int screenHeight = mc.getWindow().getGuiScaledHeight();
 
-        int barWidth = 100;
-        int barHeight = 8;
+        int barWidth = 20;
+        int barHeight = 2;
         int x = screenWidth / 2 - barWidth / 2;
-        int y = screenHeight - 50; // 经验条上方
+        int y = screenHeight / 2 + 20; // 经验条上方
 
         GuiGraphics graphics = event.getGuiGraphics();
 
         // 背景条
-        graphics.fill(x, y, x + barWidth, y + barHeight, 0xFF555555);
+        graphics.fill(x, y, x + barWidth, y + barHeight, 0x66A1A1A1);
 
         // 进度条
         int filled = (int) (barWidth * progress);
-        graphics.fill(x, y, x + filled, y + barHeight, 0xFF00FF00);
+        graphics.fill(x, y, x + filled, y + barHeight, 0xAA15FF09);
 
         // 可选文字
-        graphics.drawString(mc.font, "救援中...", x + 20, y - 10, 0xFFFFFF, false);
+        graphics.drawCenteredString(mc.font, String.format("%.1f", ClientRescueManager.getLeftTimeSeconds()), x + barWidth / 2, y - 10, 0xFFFFFF);
     }
 }

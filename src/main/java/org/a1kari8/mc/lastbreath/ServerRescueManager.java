@@ -4,6 +4,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +22,12 @@ public class ServerRescueManager {
     private static final BiMap<UUID, UUID> rescuerAndTarget = HashBiMap.create();
 
     // 检测右键松开的阈值（tick）
-    private static final int RELEASE_THRESHOLD_TICKS = 3;
-    private static final long RESCUE_DURATION_TICK = Config.RESCUE_DURATION_MILLISECOND.getAsInt() / 20;
+    private static final int RELEASE_THRESHOLD_TICKS = 4;
+//    private static long RESCUE_DURATION_TICK = 3000 / 20;
+
+    public static int getRescueDurationTick() {
+        return ServerConfig.RESCUE_DURATION_MILLISECOND.getAsInt() / 1000 * 20;
+    }
 
     public static void startRescue(Player rescuer, Player target) {
         UUID targetId = target.getUUID();
@@ -30,6 +35,7 @@ public class ServerRescueManager {
         long gameTime = rescuer.level().getGameTime();
         rescueStartTick.put(targetId, gameTime);
         rescueCurrentTick.put(targetId, gameTime);
+        rescuerAndTarget.put(rescuer.getUUID(), targetId);
     }
 
 
@@ -39,7 +45,6 @@ public class ServerRescueManager {
 
     public static ServerPlayer getTarget(ServerPlayer rescuer) {
         return Objects.requireNonNull(rescuer.server.getPlayerList().getPlayer(rescuerAndTarget.get(rescuer.getUUID())));
-
     }
 
     public static ServerPlayer getRescuer(ServerPlayer target) {
@@ -69,8 +74,8 @@ public class ServerRescueManager {
         cancelBeingRescued(target);
     }
 
-    public static boolean isRightClickReleased(Player target) {
-        return target.level().getGameTime() - rescueCurrentTick.getOrDefault(target.getUUID(), 0L) > RELEASE_THRESHOLD_TICKS;
+    public static boolean isRightClickReleased(Player rescuer) {
+        return rescuer.level().getGameTime() - rescueCurrentTick.getOrDefault(rescuerAndTarget.get(rescuer.getUUID()), 0L) > RELEASE_THRESHOLD_TICKS;
     }
 
     public static boolean isBeingRescued(Player target) {
@@ -85,14 +90,14 @@ public class ServerRescueManager {
         Long start = rescueStartTick.get(target.getUUID());
         if (start == null) return 0f;
         long elapsed = rescueCurrentTick.get(target.getUUID()) - start;
-        return Math.min(elapsed / (float) RESCUE_DURATION_TICK, 1f);
+        return Math.min(elapsed / (float) getRescueDurationTick(), 1f);
     }
 
     public static float getRescuingProgress(Player rescuer) {
         Long start = rescueStartTick.get(rescuerAndTarget.get(rescuer.getUUID()));
         if (start == null) return 0f;
         long elapsed = rescueCurrentTick.get(rescuerAndTarget.get(rescuer.getUUID())) - start;
-        return Math.min(elapsed / (float) RESCUE_DURATION_TICK, 1f);
+        return Math.min(elapsed / (float) getRescueDurationTick(), 1f);
     }
 
     public static boolean isRescuingComplete(Player rescuer) {
