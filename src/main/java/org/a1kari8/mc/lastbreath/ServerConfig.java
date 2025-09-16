@@ -4,14 +4,15 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 // An example config class. This is not required, but it's a good idea to have one to keep your config organized.
 // Demonstrates how to use Neo's config APIs
-public class Config {
+public class ServerConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
-
-    static final ModConfigSpec SPEC = BUILDER.build();
 
     public static final ModConfigSpec.IntValue RESCUE_DURATION_MILLISECOND = BUILDER
             .comment("Duration in millisecond for the rescue action")
-            .defineInRange("rescueDuration", 3000, 1, Integer.MAX_VALUE);
+            .defineInRange("rescueDuration", 3000, 1, Short.MAX_VALUE);
+
+    // 该条必须放在最后
+    public static final ModConfigSpec SPEC = BUILDER.build();
 
 //    public static final ModConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER
 //            .comment("Whether to log the dirt block on common setup")
