@@ -3,6 +3,7 @@ package org.a1kari8.mc.lastbreath.client;
 import net.minecraft.client.Minecraft;
 import org.a1kari8.mc.lastbreath.ServerRescueManager;
 import org.a1kari8.mc.lastbreath.network.RescueState;
+import org.jetbrains.annotations.ApiStatus;
 
 public class ClientRescueManager {
     private static long rescueStartTick = 0;

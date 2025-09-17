@@ -22,6 +22,7 @@ import org.a1kari8.mc.lastbreath.ServerRescueManager;
 import org.a1kari8.mc.lastbreath.network.RescueState;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
 import org.a1kari8.mc.lastbreath.network.payload.RescueStatePayload;
+import org.jetbrains.annotations.ApiStatus;
 
 import static org.a1kari8.mc.lastbreath.LastBreath.MODID;
 
@@ -29,54 +30,65 @@ import static org.a1kari8.mc.lastbreath.LastBreath.MODID;
 public class RescueEventHandler {
     @SubscribeEvent
     public static void onRescueAttempt(PlayerInteractEvent.EntityInteract event) {
-        if (!(event.getTarget() instanceof Player target)) return;
+        if (!canRescueAttempt(event)) return;
+        Player target = (Player) event.getTarget();
         Player rescuer = event.getEntity();
-        if (event.getLevel().isClientSide) return;
 
-        if (!target.getPersistentData().getBoolean("Dying") || rescuer.getPersistentData().getBoolean("Dying")){
-            // 被救援者没有濒死状态或救援者是濒死状态，无法救援
+        boolean isRescuing = ServerRescueManager.isBeingRescued(target) || ServerRescueManager.isRescuing(rescuer);
+
+        if (!(target instanceof ServerPlayer serverTarget) || !(rescuer instanceof ServerPlayer serverRescuer)) return;
+        if (!rescuer.isCrouching()) {
+            if (isRescuing){
+                handleCancelRescue(serverTarget, serverRescuer);
+            }
             return;
         }
+        if (!isRescuing) {
+            handleStartRescue(serverRescuer, serverTarget);
+            return;
+        }
+        handleUpdateRescue(serverRescuer, serverTarget);
+        handleCompleteRescue(serverRescuer, serverTarget, event);
+    }
 
-        if (target instanceof ServerPlayer serverTarget && rescuer instanceof ServerPlayer serverRescuer) {
-            boolean isRescuing = ServerRescueManager.isBeingRescued(target) || ServerRescueManager.isRescuing(rescuer);
+    private static boolean canRescueAttempt(PlayerInteractEvent.EntityInteract event) {
+        if (!(event.getTarget() instanceof Player target)) return false;
+        Player rescuer = event.getEntity();
+        if (event.getLevel().isClientSide) return false;
+        if (!target.getPersistentData().getBoolean("Dying") || rescuer.getPersistentData().getBoolean("Dying")) {
+            return false;
+        }
+        if (!(target instanceof ServerPlayer) || !(rescuer instanceof ServerPlayer)) return false;
+        return true;
+    }
 
-            if (!rescuer.isCrouching()) {
-                // 如果施救者没有蹲下
-                if (isRescuing) {
-                    // 如果当前正在救援中，则取消救援
-                    ServerRescueManager.cancelRescuing(rescuer);
-                    // 向客户端发送取消救援的消息
-                    PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload(RescueState.CANCEL));
-                    PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload(RescueState.CANCEL));
-                }
-                // 否则什么也不做
-                return;
-            }
-            if (!isRescuing) {
-                // 开始救援
-                ServerRescueManager.startRescue(rescuer,target);
-                // 向客户端发送开始救援的消息
-                PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload( RescueState.START));
-                PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload( RescueState.START));
-                return;
-            }
+    private static void handleCancelRescue(ServerPlayer serverTarget, ServerPlayer serverRescuer) {
+        ServerRescueManager.cancelRescuing(serverRescuer);
+        PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload(RescueState.CANCEL));
+        PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload(RescueState.CANCEL));
+    }
 
-            // 更新救援进度
-            ServerRescueManager.updateRescue(rescuer, target);
-            if (ServerRescueManager.isBeingRescuedComplete(target) || ServerRescueManager.isRescuingComplete(rescuer)) {
-                // 判断救援是否完成
-                ServerRescueManager.completeBeingRescued(target);
-                // 向客户端发送救援完成的消息
-                PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload(RescueState.COMPLETE));
-                PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload( RescueState.COMPLETE));
+    private static void handleStartRescue(ServerPlayer serverRescuer, ServerPlayer serverTarget) {
+        ServerRescueManager.startRescue(serverRescuer, serverTarget);
+        PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload(RescueState.START));
+        PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload(RescueState.START));
+    }
 
-                rescuePlayer(serverTarget, (float) ServerConfig.RESCUE_HEALTH.getAsDouble());
-                event.setCanceled(true);
-            }
+    private static void handleUpdateRescue(ServerPlayer serverRescuer, ServerPlayer serverTarget) {
+        ServerRescueManager.updateRescue(serverRescuer, serverTarget);
+    }
+
+    private static void handleCompleteRescue(ServerPlayer serverRescuer, ServerPlayer serverTarget, PlayerInteractEvent.EntityInteract event) {
+        if (ServerRescueManager.isBeingRescuedComplete(serverTarget) || ServerRescueManager.isRescuingComplete(serverRescuer)) {
+            ServerRescueManager.completeBeingRescued(serverTarget);
+            PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload(RescueState.COMPLETE));
+            PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload(RescueState.COMPLETE));
+            rescuePlayer(serverTarget, (float) ServerConfig.RESCUE_HEALTH.getAsDouble());
+            event.setCanceled(true);
         }
     }
 
+    @ApiStatus.Internal
     public static void rescuePlayer(ServerPlayer serverTarget, float healthAfterRescue) {
         // 移除濒死状态
 //                target.removeEffect(LastBreath.DYING_MOB_EFFECT);
@@ -103,23 +115,32 @@ public class RescueEventHandler {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
         if (!player.level().isClientSide && player instanceof ServerPlayer serverPlayer) {
-            // 正在救援中
-            if (ServerRescueManager.isRescuing(player)) {
-                if (ServerRescueManager.isRightClickReleased(player)) {
-                    // 向客户端发送取消救援的消息
-                    PacketDistributor.sendToPlayer(ServerRescueManager.getTarget(serverPlayer), new RescueStatePayload( RescueState.CANCEL));
-                    PacketDistributor.sendToPlayer(serverPlayer, new RescueStatePayload( RescueState.CANCEL));
-                    // 判断右键松开则取消救援
-                    ServerRescueManager.cancelRescuing(serverPlayer);
-                    return;
-                }
+            handleRescueCancel(serverPlayer);
+            handleBleeding(serverPlayer);
+        }
+    }
+
+    /**
+     * 处理救援取消逻辑
+     */
+    private static void handleRescueCancel(ServerPlayer serverPlayer) {
+        if (ServerRescueManager.isRescuing(serverPlayer)) {
+            if (ServerRescueManager.isRightClickReleased(serverPlayer)) {
+                PacketDistributor.sendToPlayer(ServerRescueManager.getTarget(serverPlayer), new RescueStatePayload(RescueState.CANCEL));
+                PacketDistributor.sendToPlayer(serverPlayer, new RescueStatePayload(RescueState.CANCEL));
+                ServerRescueManager.cancelRescuing(serverPlayer);
             }
-            if (player.getPersistentData().getBoolean("Dying") && player.getPersistentData().getBoolean("Bleeding") && ServerConfig.BLEEDING_DURATION.getAsInt() > 0 && !ServerRescueManager.isBeingRescued(player)) {
-                // 如果濒死玩家没有被救援且开启流血配置项，则流血
-                if (player.tickCount % 20 == 0) {
-                    float currentHealth = player.getHealth();
-                    player.setHealth(currentHealth - currentHealth / ServerConfig.BLEEDING_DURATION.getAsInt());
-                }
+        }
+    }
+
+    /**
+     * 处理流血逻辑
+     */
+    private static void handleBleeding(ServerPlayer serverPlayer) {
+        if (serverPlayer.getPersistentData().getBoolean("Dying") && serverPlayer.getPersistentData().getBoolean("Bleeding") && ServerConfig.BLEEDING_DURATION.getAsInt() > 0 && !ServerRescueManager.isBeingRescued(serverPlayer)) {
+            if (serverPlayer.tickCount % 20 == 0) {
+                float currentHealth = serverPlayer.getHealth();
+                serverPlayer.setHealth(currentHealth - currentHealth / ServerConfig.BLEEDING_DURATION.getAsInt());
             }
         }
     }
