@@ -33,8 +33,8 @@ public class RescueEventHandler {
         Player rescuer = event.getEntity();
         if (event.getLevel().isClientSide) return;
 
-        if (!target.getPersistentData().getBoolean("Dying")) {
-            // 被救援者没有濒死状态，无法救援
+        if (!target.getPersistentData().getBoolean("Dying") || rescuer.getPersistentData().getBoolean("Dying")){
+            // 被救援者没有濒死状态或救援者是濒死状态，无法救援
             return;
         }
 
