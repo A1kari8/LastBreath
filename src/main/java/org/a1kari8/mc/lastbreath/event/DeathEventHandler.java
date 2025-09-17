@@ -42,6 +42,10 @@ public class DeathEventHandler {
             if (movementSpeed != null) {
                 movementSpeed.setBaseValue(0.1); // 默认是 0.1
             }
+            AttributeInstance maxHealth = player.getAttribute(Attributes.MAX_HEALTH);
+            if (maxHealth != null) {
+                maxHealth.setBaseValue(20.0); // 默认是 20.0
+            }
             player.setForcedPose(null);
             player.getPersistentData().putBoolean("Dying", false);
             player.getPersistentData().putBoolean("Bleeding", false);
@@ -68,7 +72,11 @@ public class DeathEventHandler {
         player.setHealth(dyingHealth);
         AttributeInstance movementSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED);
         if (movementSpeed != null) {
-            movementSpeed.setBaseValue(0.04); // 默认是 0.1
+            movementSpeed.setBaseValue(ServerConfig.DYING_SPEED.getAsDouble()); // 默认是 0.1
+        }
+        AttributeInstance maxHealth = player.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealth != null) {
+            maxHealth.setBaseValue(ServerConfig.DYING_MAX_HEALTH.getAsDouble()); // 默认是 20.0
         }
     }
 }

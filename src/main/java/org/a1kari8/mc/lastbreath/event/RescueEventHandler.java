@@ -6,13 +6,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ProjectileWeaponItem;
-import net.minecraft.world.item.TridentItem;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -38,7 +33,7 @@ public class RescueEventHandler {
 
         if (!(target instanceof ServerPlayer serverTarget) || !(rescuer instanceof ServerPlayer serverRescuer)) return;
         if (!rescuer.isCrouching()) {
-            if (isRescuing){
+            if (isRescuing) {
                 handleCancelRescue(serverTarget, serverRescuer);
             }
             return;
@@ -58,8 +53,7 @@ public class RescueEventHandler {
         if (!target.getPersistentData().getBoolean("Dying") || rescuer.getPersistentData().getBoolean("Dying")) {
             return false;
         }
-        if (!(target instanceof ServerPlayer) || !(rescuer instanceof ServerPlayer)) return false;
-        return true;
+        return target instanceof ServerPlayer && rescuer instanceof ServerPlayer;
     }
 
     private static void handleCancelRescue(ServerPlayer serverTarget, ServerPlayer serverRescuer) {
@@ -96,6 +90,10 @@ public class RescueEventHandler {
         if (movementSpeed != null) {
             movementSpeed.setBaseValue(0.1); // 默认是 0.1
         }
+        AttributeInstance maxHealth = serverTarget.getAttribute(Attributes.MAX_HEALTH);
+        if (maxHealth != null) {
+            maxHealth.setBaseValue(20.0); // 默认是 20.0
+        }
         serverTarget.setHealth(healthAfterRescue);
         serverTarget.getPersistentData().putBoolean("Dying", false);
         serverTarget.getPersistentData().putBoolean("Bleeding", false);
@@ -109,6 +107,7 @@ public class RescueEventHandler {
 
     /**
      * 判断施救玩家是否松开右键
+     *
      * @param event
      */
     @SubscribeEvent
@@ -138,9 +137,9 @@ public class RescueEventHandler {
      */
     private static void handleBleeding(ServerPlayer serverPlayer) {
         if (serverPlayer.getPersistentData().getBoolean("Dying") && serverPlayer.getPersistentData().getBoolean("Bleeding") && ServerConfig.BLEEDING_DURATION.getAsInt() > 0 && !ServerRescueManager.isBeingRescued(serverPlayer)) {
-            if (serverPlayer.tickCount % 20 == 0) {
+            if (serverPlayer.tickCount % 100 == 0) {
                 float currentHealth = serverPlayer.getHealth();
-                serverPlayer.setHealth(currentHealth - currentHealth / ServerConfig.BLEEDING_DURATION.getAsInt());
+                serverPlayer.setHealth(currentHealth - currentHealth * 5 / ServerConfig.BLEEDING_DURATION.getAsInt());
             }
         }
     }
@@ -152,11 +151,16 @@ public class RescueEventHandler {
 
     @SubscribeEvent
     public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        clearRescue(event.getEntity());
+        Player player = event.getEntity();
+        clearRescue(player);
+        if (player.getPersistentData().getBoolean("Dying")) {
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new DyingStatePayload(true));
+        }
     }
 
     /**
      * 清除玩家的救援状态
+     *
      * @param player
      */
     private static void clearRescue(Player player) {
@@ -173,36 +177,5 @@ public class RescueEventHandler {
         }
     }
 
-    /**
-     * 拦截倒地玩家的攻击行为
-     * @param event
-     */
-    @SubscribeEvent
-    public static void onAttack(AttackEntityEvent event) {
-        Player player = event.getEntity();
-        if (player.level().isClientSide) return;
-        if (player.getPersistentData().getBoolean("Dying")) {
-            event.setCanceled(true); // 阻止攻击
-        }
-    }
-
-    /**
-     * 拦截倒地玩家使用远程武器
-     * @param event
-     */
-    @SubscribeEvent
-    public static void onRightClick(PlayerInteractEvent.RightClickItem event) {
-        if (event.getEntity().getPersistentData().getBoolean("Dying")) {
-            ItemStack stack = event.getItemStack();
-            if (isRangedWeapon(stack)) {
-                event.setCanceled(true);
-            }
-        }
-    }
-
-    private static boolean isRangedWeapon(ItemStack stack) {
-        Item item = stack.getItem();
-        return item instanceof ProjectileWeaponItem || item instanceof TridentItem;
-    }
 
 }
