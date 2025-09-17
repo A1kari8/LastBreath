@@ -16,6 +16,7 @@ import org.a1kari8.mc.lastbreath.ServerRescueManager;
 import org.a1kari8.mc.lastbreath.network.RescueState;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
 import org.a1kari8.mc.lastbreath.network.payload.RescueStatePayload;
+import org.jetbrains.annotations.ApiStatus;
 
 import static org.a1kari8.mc.lastbreath.LastBreath.MODID;
 
@@ -29,12 +30,21 @@ public class DeathEventHandler {
 
         // 如果已经濒死，就允许死亡
         if (player.getPersistentData().getBoolean("Dying")) {
-            if (ServerRescueManager.isBeingRescued(player) && player instanceof ServerPlayer serverPlayer) {
-                PacketDistributor.sendToPlayer(serverPlayer, new RescueStatePayload(RescueState.CANCEL));
-                PacketDistributor.sendToPlayer(ServerRescueManager.getRescuer(serverPlayer), new RescueStatePayload(RescueState.CANCEL));
-                ServerRescueManager.cancelBeingRescued(player);
+            if (player instanceof ServerPlayer serverPlayer) {
+                if (ServerRescueManager.isBeingRescued(player)) {
+                    PacketDistributor.sendToPlayer(serverPlayer, new RescueStatePayload(RescueState.CANCEL));
+                    PacketDistributor.sendToPlayer(ServerRescueManager.getRescuer(serverPlayer), new RescueStatePayload(RescueState.CANCEL));
+                    ServerRescueManager.cancelBeingRescued(player);
+                }
+                PacketDistributor.sendToPlayer(serverPlayer, new DyingStatePayload(false));
             }
+            AttributeInstance movementSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED);
+            if (movementSpeed != null) {
+                movementSpeed.setBaseValue(0.1); // 默认是 0.1
+            }
+            player.setForcedPose(null);
             player.getPersistentData().putBoolean("Dying", false);
+            player.getPersistentData().putBoolean("Bleeding", false);
             return;
         }
 
@@ -46,6 +56,7 @@ public class DeathEventHandler {
 //        player.addEffect(new MobEffectInstance(LastBreath.DYING_MOB_EFFECT, Integer.MAX_VALUE, 0, false, false));
     }
 
+    @ApiStatus.Internal
     public static void setDying(Player player, float dyingHealth) {
         // 设置濒死状态
         player.getPersistentData().putBoolean("Dying", true);
