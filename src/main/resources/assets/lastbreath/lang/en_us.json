@@ -8,5 +8,7 @@
   "lastbreath.config.rescue_duration": "Duration in millisecond for the rescue action",
   "lastbreath.config.bleeding_duration": "Duration in second for the bleeding until death (-1 means no bleeding)",
   "lastbreath.config.dying_health": "Health value when a player enters dying state",
-  "lastbreath.config.rescue_health": "Health value after a player is rescued"
+  "lastbreath.config.dying_max_health": "Max health when a player is dying state",
+  "lastbreath.config.rescue_health": "Health value after a player is rescued",
+  "lastbreath.config.dying_speed": "Speed when a player is dying"
 }

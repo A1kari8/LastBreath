@@ -8,5 +8,7 @@
   "lastbreath.config.rescue_duration": "救援所需的时间（毫秒）",
   "lastbreath.config.bleeding_duration": "直到死亡的流血持续时间（秒）（-1表示不流血）",
   "lastbreath.config.dying_health": "玩家进入濒死状态时的生命值",
-  "lastbreath.config.rescue_health": "玩家被救起后的生命值"
+  "lastbreath.config.dying_max_health": "玩家处于濒死状态时的最大生命值",
+  "lastbreath.config.rescue_health": "玩家被救起后的生命值",
+  "lastbreath.config.dying_speed": "玩家濒死时的移动速度"
 }

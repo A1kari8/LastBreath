@@ -21,7 +21,7 @@ public class ServerRescueManager {
     private static final BiMap<UUID, UUID> rescuerAndTarget = HashBiMap.create();
 
     // 检测右键松开的阈值（tick）
-    private static final int RELEASE_THRESHOLD_TICKS = 4;
+    private static final int RELEASE_THRESHOLD_TICKS = 6;
 //    private static long RESCUE_DURATION_TICK = 3000 / 20;
 
     public static int getRescueDurationTick() {
