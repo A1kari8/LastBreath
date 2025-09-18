@@ -5,8 +5,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.a1kari8.mc.lastbreath.LastBreath;
+import org.a1kari8.mc.lastbreath.network.handler.DyingListHandler;
 import org.a1kari8.mc.lastbreath.network.handler.DyingStateHandler;
 import org.a1kari8.mc.lastbreath.network.handler.RescueStateHandler;
+import org.a1kari8.mc.lastbreath.network.payload.DyingListPayload;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
 import org.a1kari8.mc.lastbreath.network.payload.RescueStatePayload;
 
@@ -27,6 +29,12 @@ public class LastBreathNetwork {
                 DyingStatePayload.TYPE,
                 DyingStatePayload.CODEC,
                 DyingStateHandler::handleDataOnMain
+        );
+
+        registrar.playToClient(
+                DyingListPayload.TYPE,
+                DyingListPayload.CODEC,
+                DyingListHandler::handleDataOnMain
         );
     }
 }

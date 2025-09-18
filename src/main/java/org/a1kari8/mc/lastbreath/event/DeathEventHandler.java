@@ -6,6 +6,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -23,6 +24,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.a1kari8.mc.lastbreath.LastBreath;
 import org.a1kari8.mc.lastbreath.ServerConfig;
+import org.a1kari8.mc.lastbreath.ServerDyingManager;
 import org.a1kari8.mc.lastbreath.ServerRescueManager;
 import org.a1kari8.mc.lastbreath.network.RescueState;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
@@ -82,6 +84,7 @@ public class DeathEventHandler {
         serverPlayer.setData(LastBreath.DYING, false);
         serverPlayer.setData(LastBreath.BLEEDING, false);
         PacketDistributor.sendToPlayer(serverPlayer, new DyingStatePayload(false));
+        ServerDyingManager.removeDying(serverPlayer.getUUID());
     }
 
     @ApiStatus.Internal
@@ -105,13 +108,14 @@ public class DeathEventHandler {
         if (maxHealth != null) {
             maxHealth.setBaseValue(ServerConfig.DYING_MAX_HEALTH.getAsDouble()); // 默认是 20.0
         }
+        ServerDyingManager.addDying(player.getUUID());
     }
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null && player.getData(LastBreath.DYING) && player.tickCount % 10 == 0) {
-            player.playSound(LastBreath.HEARTBEAT.get(), 1.0F, 1.0F);
+        if (player != null && player.getData(LastBreath.DYING) && player.tickCount % 15 == 0) {
+            player.playSound(SoundEvents.WARDEN_HEARTBEAT, 1.0F, 1.0F);
         }
     }
 }
