@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Pose;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.a1kari8.mc.lastbreath.LastBreath;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
 
 public class DyingStateHandler {
@@ -12,6 +13,7 @@ public class DyingStateHandler {
             LocalPlayer player = Minecraft.getInstance().player;
             if (player != null) {
                 player.setForcedPose(data.isDying() ? Pose.SWIMMING : null);
+                player.setData(LastBreath.DYING, data.isDying());
             }
         });
     }

@@ -1,0 +1,12 @@
+{
+  "heartbeat": {
+    "category": "player",
+    "subtitle": "heartbeat",
+    "sounds": [
+      {
+        "name": "lastbreath:heartbeat",
+        "stream": false
+      }
+    ]
+  }
+}

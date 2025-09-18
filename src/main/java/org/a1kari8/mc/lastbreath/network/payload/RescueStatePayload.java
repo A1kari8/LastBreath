@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public record RescueStatePayload(RescueState rescueState) implements CustomPacketPayload {
     public static final Type<RescueStatePayload> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(LastBreath.MODID, "rescue_progress"));
+            new Type<>(ResourceLocation.fromNamespaceAndPath(LastBreath.MOD_ID, "rescue_progress"));
 
 //    public static final StreamCodec<ByteBuf, UUID> UUID_CODEC = new StreamCodec<>() {
 //        @Override

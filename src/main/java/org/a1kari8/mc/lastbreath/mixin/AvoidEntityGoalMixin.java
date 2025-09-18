@@ -3,6 +3,7 @@ package org.a1kari8.mc.lastbreath.mixin;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.AvoidEntityGoal;
 import net.minecraft.world.entity.player.Player;
+import org.a1kari8.mc.lastbreath.LastBreath;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +22,7 @@ public class AvoidEntityGoalMixin {
     private void cancelIfDowned(CallbackInfoReturnable<Boolean> cir) {
         if (toAvoid instanceof Player player) {
             System.out.println("AvoidEntityGoalMixin: call canUse, toAvoid is player");
-            if (player.getPersistentData().getBoolean("Dying")) {
+            if (player.getData(LastBreath.DYING)) {
                 System.out.println("AvoidEntityGoalMixin: Cancelling canUse because player is downed");
                 toAvoid = null;
                 cir.setReturnValue(false);
@@ -33,7 +34,7 @@ public class AvoidEntityGoalMixin {
     private void cancelIfDownedContinue(CallbackInfoReturnable<Boolean> cir) {
         if (toAvoid instanceof Player player) {
             System.out.println("AvoidEntityGoalMixin: call canContinueToUse, toAvoid is player");
-            if (player.getPersistentData().getBoolean("Dying")) {
+            if (player.getData(LastBreath.DYING)) {
                 System.out.println("AvoidEntityGoalMixin: Cancelling canContinueToUse because player is downed");
                 toAvoid = null;
                 cir.setReturnValue(false);

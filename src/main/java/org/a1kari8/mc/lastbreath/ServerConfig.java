@@ -32,10 +32,10 @@ public class ServerConfig {
             .translation("lastbreath.config.rescue_health")
             .defineInRange("rescueHealth", 6.0, 1.0, 20.0);
 
-    public static final ModConfigSpec.DoubleValue DYING_SPEED = BUILDER
-            .comment("Speed when a player is dying")
+    public static final ModConfigSpec.DoubleValue DYING_SPEED_MULTIPLE = BUILDER
+            .comment("Dying speed multiple")
             .translation("lastbreath.config.dying_speed")
-            .defineInRange("dyingSpeed", 0.04, 0.01, 0.1);
+            .defineInRange("dyingSpeed", 0.4, 0.01, 1.0);
 
     // 该条必须放在最后
     public static final ModConfigSpec SPEC = BUILDER.build();

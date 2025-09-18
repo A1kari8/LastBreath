@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import org.a1kari8.mc.lastbreath.LastBreath;
 
-@EventBusSubscriber(modid = LastBreath.MODID)
+@EventBusSubscriber(modid = LastBreath.MOD_ID)
 public class PlayerAttackEventHandler {
     /**
      * 拦截倒地玩家的攻击行为
@@ -21,7 +21,7 @@ public class PlayerAttackEventHandler {
     public static void onAttack(AttackEntityEvent event) {
         Player player = event.getEntity();
         if (player.level().isClientSide) return;
-        if (player.getPersistentData().getBoolean("Dying")) {
+        if (player.getData(LastBreath.DYING)) {
             event.setCanceled(true); // 阻止攻击
         }
     }
@@ -32,7 +32,7 @@ public class PlayerAttackEventHandler {
      */
     @SubscribeEvent
     public static void onRightClick(PlayerInteractEvent.RightClickItem event) {
-        if (event.getEntity().getPersistentData().getBoolean("Dying")) {
+        if (event.getEntity().getData(LastBreath.DYING)) {
             ItemStack stack = event.getItemStack();
             if (isRangedWeapon(stack)) {
                 event.setCanceled(true);

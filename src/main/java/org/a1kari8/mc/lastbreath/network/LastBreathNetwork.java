@@ -10,7 +10,7 @@ import org.a1kari8.mc.lastbreath.network.handler.RescueStateHandler;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
 import org.a1kari8.mc.lastbreath.network.payload.RescueStatePayload;
 
-@EventBusSubscriber(modid = LastBreath.MODID)
+@EventBusSubscriber(modid = LastBreath.MOD_ID)
 public class LastBreathNetwork {
 
     @SubscribeEvent

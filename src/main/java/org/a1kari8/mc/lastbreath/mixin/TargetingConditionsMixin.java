@@ -3,6 +3,7 @@ package org.a1kari8.mc.lastbreath.mixin;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import org.a1kari8.mc.lastbreath.LastBreath;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,7 +18,7 @@ public class TargetingConditionsMixin {
     )
     private void onTest(LivingEntity attacker, LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
         if (target instanceof Player player) {
-            if (player.getPersistentData().getBoolean("Dying")) {
+            if (player.getData(LastBreath.DYING)) {
                 cir.setReturnValue(false); // 阻止目标成立
             }
         }

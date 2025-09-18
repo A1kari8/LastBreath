@@ -8,9 +8,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 
-import static org.a1kari8.mc.lastbreath.LastBreath.MODID;
+import static org.a1kari8.mc.lastbreath.LastBreath.MOD_ID;
 
-@EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
 public class RescueProgressHUD {
     @SubscribeEvent
     public static void onRenderOverlay(RenderGuiLayerEvent.Post event) {

@@ -9,7 +9,7 @@ import org.a1kari8.mc.lastbreath.LastBreath;
 import org.jetbrains.annotations.NotNull;
 
 public record DyingStatePayload(boolean isDying) implements CustomPacketPayload {
-    public static final Type<DyingStatePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(LastBreath.MODID, "dying_state"));
+    public static final Type<DyingStatePayload> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(LastBreath.MOD_ID, "dying_state"));
     public static final StreamCodec<ByteBuf, DyingStatePayload> CODEC = StreamCodec.composite(ByteBufCodecs.BOOL, DyingStatePayload::isDying, DyingStatePayload::new);
 
     @Override
