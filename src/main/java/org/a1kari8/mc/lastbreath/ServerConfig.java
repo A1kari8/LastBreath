@@ -39,6 +39,10 @@ public class ServerConfig {
             .comment("Dying invulnerable")
             .translation("lastbreath.config.dying_invulnerable")
             .define("dyingInvulnerable", false);
+    public static final ModConfigSpec.BooleanValue DYING_CAN_BE_SEEN_AS_ENEMY = BUILDER
+            .comment("Dying player can be seen as enemy")
+            .translation("lastbreath.config.dying_can_be_seen_as_enemy")
+            .define("dyingCanBeSeenAsEnemy", false);
 
     // 该条必须放在最后
     public static final ModConfigSpec SPEC = BUILDER.build();

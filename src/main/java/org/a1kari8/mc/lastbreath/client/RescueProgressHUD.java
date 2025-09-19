@@ -43,6 +43,6 @@ public class RescueProgressHUD {
         graphics.fill(x, y, x + filled, y + barHeight, 0xAA15FF09);
 
         // 可选文字
-        graphics.drawCenteredString(mc.font, String.format("%.1f", ClientRescueManager.getLeftTimeSeconds()), x + barWidth / 2, y - 10, 0xFFFFFF);
+        graphics.drawCenteredString(mc.font, String.format("%.2f", ClientRescueManager.getLeftTimeSeconds()), x + barWidth / 2, y - 10, 0xFFFFFF);
     }
 }

@@ -42,7 +42,7 @@ public record DyingListPayload(List<UUID> dyingList) implements CustomPacketPayl
             );
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 }

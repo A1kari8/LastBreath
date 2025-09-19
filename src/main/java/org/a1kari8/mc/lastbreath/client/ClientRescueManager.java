@@ -6,6 +6,11 @@ import org.a1kari8.mc.lastbreath.network.RescueState;
 
 public class ClientRescueManager {
     private static long rescueStartTick = 0;
+
+    public static RescueState getState() {
+        return state;
+    }
+
     private static RescueState state = RescueState.NONE;
 
     public static void start() {

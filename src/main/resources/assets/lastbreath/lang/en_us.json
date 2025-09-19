@@ -11,5 +11,6 @@
   "lastbreath.config.dying_max_health": "Max health when a player is dying state",
   "lastbreath.config.rescue_health": "Health value after a player is rescued",
   "lastbreath.config.dying_speed": "Dying speed multiple",
-  "lastbreath.config.dying_invulnerable": "Dying invulnerable"
+  "lastbreath.config.dying_invulnerable": "Dying invulnerable",
+  "lastbreath.config.dying_can_be_seen_as_enemy": "Dying player can be seen as enemy"
 }

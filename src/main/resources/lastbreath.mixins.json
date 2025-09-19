@@ -3,17 +3,18 @@
   "package": "org.a1kari8.mc.lastbreath.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "AvoidEntityGoalMixin",
-    "EntitySelectorMixin",
-    "TargetingConditionsMixin"
+    "LivingEntityMixin"
   ],
-  "server": [],
+  "server": [
+
+  ],
+  "client": [
+
+  ],
   "injectors": {
     "defaultRequire": 1
   },
   "overwrites": {
     "requireAnnotations": true
-  },
-  "client": [
-  ]
+  }
 }

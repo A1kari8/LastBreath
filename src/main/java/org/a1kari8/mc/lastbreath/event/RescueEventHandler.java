@@ -9,6 +9,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -18,6 +19,7 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.a1kari8.mc.lastbreath.LastBreath;
 import org.a1kari8.mc.lastbreath.ServerConfig;
 import org.a1kari8.mc.lastbreath.ServerRescueManager;
+import org.a1kari8.mc.lastbreath.client.ClientRescueManager;
 import org.a1kari8.mc.lastbreath.network.RescueState;
 import org.a1kari8.mc.lastbreath.network.payload.RescueStatePayload;
 import org.jetbrains.annotations.ApiStatus;
@@ -27,8 +29,8 @@ import static org.a1kari8.mc.lastbreath.LastBreath.MOD_ID;
 
 @EventBusSubscriber(modid = MOD_ID)
 public class RescueEventHandler {
-    @SubscribeEvent
-    public static void onRescueAttempt(PlayerInteractEvent.EntityInteractSpecific event) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onRescueAttempt(PlayerInteractEvent.EntityInteract event) {
         if (!canRescueAttempt(event)) return;
         Player target = (Player) event.getTarget();
         Player rescuer = event.getEntity();
@@ -46,7 +48,7 @@ public class RescueEventHandler {
         }
         if (!isRescuing) {
             handleStartRescue(serverRescuer, serverTarget);
-            event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCancellationResult(InteractionResult.CONSUME);
             event.setCanceled(true);
             return;
         }
@@ -54,10 +56,20 @@ public class RescueEventHandler {
         handleCompleteRescue(serverRescuer, serverTarget, event);
     }
 
-    private static boolean canRescueAttempt(PlayerInteractEvent.EntityInteractSpecific event) {
+    @SubscribeEvent
+    public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+        if (ClientRescueManager.getState() == RescueState.RESCUING) {
+            event.setCancellationResult(InteractionResult.FAIL);
+            event.setCanceled(true);
+        }
+    }
+
+    private static boolean canRescueAttempt(PlayerInteractEvent.EntityInteract event) {
         if (!(event.getTarget() instanceof Player target)) return false;
         Player rescuer = event.getEntity();
-        if (event.getLevel().isClientSide) return false;
+        if (event.getLevel().isClientSide) {
+            return false;
+        }
         if (!target.getData(LastBreath.DYING) || rescuer.getData(LastBreath.DYING)) {
             return false;
         }
@@ -80,14 +92,14 @@ public class RescueEventHandler {
         ServerRescueManager.updateRescue(serverRescuer, serverTarget);
     }
 
-    private static void handleCompleteRescue(ServerPlayer serverRescuer, ServerPlayer serverTarget, PlayerInteractEvent.EntityInteractSpecific event) {
+    private static void handleCompleteRescue(ServerPlayer serverRescuer, ServerPlayer serverTarget, PlayerInteractEvent.EntityInteract event) {
         if (ServerRescueManager.isBeingRescuedComplete(serverTarget) || ServerRescueManager.isRescuingComplete(serverRescuer)) {
             ServerRescueManager.completeBeingRescued(serverTarget);
             PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload(RescueState.COMPLETE));
             PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload(RescueState.COMPLETE));
             rescuePlayer(serverRescuer, serverTarget, (float) ServerConfig.RESCUE_HEALTH.getAsDouble());
         }
-        event.setCancellationResult(InteractionResult.SUCCESS);
+        event.setCancellationResult(InteractionResult.CONSUME);
         event.setCanceled(true);
     }
 
@@ -117,9 +129,6 @@ public class RescueEventHandler {
             if (player.getData(LastBreath.DYING)) {
                 handleBleeding(serverPlayer);
             }
-//            if (serverPlayer.tickCount == 5 && !ServerDyingManager.getDying().isEmpty()) {
-//                PacketDistributor.sendToPlayer(serverPlayer, new DyingListPayload(ServerDyingManager.getDying()));
-//            }
         }
     }
 
