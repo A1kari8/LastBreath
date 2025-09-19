@@ -1,4 +1,4 @@
-﻿package org.a1kari8.mc.lastbreath;
+package org.a1kari8.mc.lastbreath;
 
 import java.util.*;
 

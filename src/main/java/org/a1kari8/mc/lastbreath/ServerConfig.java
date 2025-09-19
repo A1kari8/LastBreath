@@ -2,8 +2,6 @@ package org.a1kari8.mc.lastbreath;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-// An example config class. This is not required, but it's a good idea to have one to keep your config organized.
-// Demonstrates how to use Neo's config APIs
 public class ServerConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
@@ -36,6 +34,11 @@ public class ServerConfig {
             .comment("Dying speed multiple")
             .translation("lastbreath.config.dying_speed")
             .defineInRange("dyingSpeed", 0.4, 0.01, 1.0);
+
+    public static final ModConfigSpec.BooleanValue DYING_INVULNERABLE = BUILDER
+            .comment("Dying invulnerable")
+            .translation("lastbreath.config.dying_invulnerable")
+            .define("dyingInvulnerable", false);
 
     // 该条必须放在最后
     public static final ModConfigSpec SPEC = BUILDER.build();

@@ -1,4 +1,4 @@
-﻿package org.a1kari8.mc.lastbreath.network.payload;
+package org.a1kari8.mc.lastbreath.network.payload;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

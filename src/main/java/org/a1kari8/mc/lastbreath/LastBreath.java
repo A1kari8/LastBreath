@@ -3,8 +3,6 @@ package org.a1kari8.mc.lastbreath;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.neoforged.bus.api.IEventBus;
@@ -15,9 +13,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -30,29 +25,24 @@ import java.util.function.Supplier;
 public class LastBreath {
     public static final String MOD_ID = "lastbreath";
     public static final Logger LOGGER = LogUtils.getLogger();
-
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
+            DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, MOD_ID);
+    public static final DeferredHolder<SoundEvent, SoundEvent> HEARTBEAT = SOUND_EVENTS.register(
+            "heartbeat",
+            () -> SoundEvent.createFixedRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "heartbeat"), 16)
+    );
     private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MOD_ID);
-
     public static final Supplier<AttachmentType<Boolean>> DYING = ATTACHMENT_TYPES.register("dying", () ->
             AttachmentType.builder(() -> false) // 默认值为 false
                     .serialize(Codec.BOOL)
                     .copyOnDeath()
                     .build()
     );
-
     public static final Supplier<AttachmentType<Boolean>> BLEEDING = ATTACHMENT_TYPES.register("bleeding", () ->
             AttachmentType.builder(() -> false) // 默认值为 false
                     .serialize(Codec.BOOL)
                     .copyOnDeath()
                     .build()
-    );
-
-    public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
-            DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, MOD_ID);
-
-    public static final DeferredHolder<SoundEvent, SoundEvent> HEARTBEAT = SOUND_EVENTS.register(
-            "heartbeat",
-            () -> SoundEvent.createFixedRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "heartbeat"),16)
     );
 
     public LastBreath(IEventBus modEventBus, ModContainer modContainer) {

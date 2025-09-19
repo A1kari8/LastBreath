@@ -1,21 +1,27 @@
 package org.a1kari8.mc.lastbreath.event;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.a1kari8.mc.lastbreath.LastBreath;
 import org.a1kari8.mc.lastbreath.ServerConfig;
 import org.a1kari8.mc.lastbreath.ServerRescueManager;
 import org.a1kari8.mc.lastbreath.network.RescueState;
 import org.a1kari8.mc.lastbreath.network.payload.RescueStatePayload;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import static org.a1kari8.mc.lastbreath.LastBreath.MOD_ID;
 
@@ -35,11 +41,13 @@ public class RescueEventHandler {
                 handleCancelRescue(serverTarget, serverRescuer);
             }
             event.setCancellationResult(InteractionResult.FAIL);
+            event.setCanceled(true);
             return;
         }
         if (!isRescuing) {
             handleStartRescue(serverRescuer, serverTarget);
             event.setCancellationResult(InteractionResult.SUCCESS);
+            event.setCanceled(true);
             return;
         }
         handleUpdateRescue(serverRescuer, serverTarget);
@@ -77,19 +85,22 @@ public class RescueEventHandler {
             ServerRescueManager.completeBeingRescued(serverTarget);
             PacketDistributor.sendToPlayer(serverTarget, new RescueStatePayload(RescueState.COMPLETE));
             PacketDistributor.sendToPlayer(serverRescuer, new RescueStatePayload(RescueState.COMPLETE));
-            rescuePlayer(serverTarget, (float) ServerConfig.RESCUE_HEALTH.getAsDouble());
-//            event.setCanceled(true);
+            rescuePlayer(serverRescuer, serverTarget, (float) ServerConfig.RESCUE_HEALTH.getAsDouble());
         }
         event.setCancellationResult(InteractionResult.SUCCESS);
+        event.setCanceled(true);
     }
 
     @ApiStatus.Internal
-    public static void rescuePlayer(ServerPlayer serverTarget, float healthAfterRescue) {
+    public static void rescuePlayer(@Nullable ServerPlayer serverRescuer, ServerPlayer serverTarget, float healthAfterRescue) {
         DeathEventHandler.clearDyingState(serverTarget);
         serverTarget.setHealth(healthAfterRescue);
+        serverTarget.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 254, false, false));
         serverTarget.level().playSound(null, serverTarget.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.0F);
-//                rescuer.sendSystemMessage(Component.literal("你成功救援了 " + target.getName().getString()));
-//                target.sendSystemMessage(Component.literal("你被 " + rescuer.getName().getString() + " 救援了！"));
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null && serverRescuer != null) {
+            server.getPlayerList().broadcastSystemMessage(Component.literal(serverRescuer.getName().getString() + "救了" + serverTarget.getName().getString()),false);
+        }
     }
 
 
@@ -106,6 +117,9 @@ public class RescueEventHandler {
             if (player.getData(LastBreath.DYING)) {
                 handleBleeding(serverPlayer);
             }
+//            if (serverPlayer.tickCount == 5 && !ServerDyingManager.getDying().isEmpty()) {
+//                PacketDistributor.sendToPlayer(serverPlayer, new DyingListPayload(ServerDyingManager.getDying()));
+//            }
         }
     }
 

@@ -20,10 +20,10 @@ public class LastBreathApi {
         DeathEventHandler.setDying(player, dyingHealth);
     }
     public static void rescuePlayer(ServerPlayer player) {
-        RescueEventHandler.rescuePlayer(player, (float) ServerConfig.RESCUE_HEALTH.getAsDouble());
+        RescueEventHandler.rescuePlayer(null,player, (float) ServerConfig.RESCUE_HEALTH.getAsDouble());
     }
     public static void rescuePlayer(ServerPlayer player, float healthAfterRescue) {
-        RescueEventHandler.rescuePlayer(player, healthAfterRescue);
+        RescueEventHandler.rescuePlayer(null ,player, healthAfterRescue);
     }
     public static void setBleeding(ServerPlayer player, boolean bleeding) {
         player.setData(LastBreath.BLEEDING, bleeding);

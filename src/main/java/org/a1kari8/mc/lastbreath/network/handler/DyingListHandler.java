@@ -1,4 +1,4 @@
-﻿package org.a1kari8.mc.lastbreath.network.handler;
+package org.a1kari8.mc.lastbreath.network.handler;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;

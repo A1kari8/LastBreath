@@ -7,6 +7,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.a1kari8.mc.lastbreath.LastBreath;
+import org.a1kari8.mc.lastbreath.ServerDyingManager;
+import org.a1kari8.mc.lastbreath.network.payload.DyingListPayload;
 import org.a1kari8.mc.lastbreath.network.payload.DyingStatePayload;
 
 @EventBusSubscriber(modid = LastBreath.MOD_ID)
@@ -23,6 +25,9 @@ public class PlayerLoginEventHandler {
         RescueEventHandler.clearRescue(player);
         if (player.getData(LastBreath.DYING)) {
             PacketDistributor.sendToPlayer((ServerPlayer) player, new DyingStatePayload(true));
+        }
+        if (!ServerDyingManager.getDying().isEmpty()) {
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new DyingListPayload(ServerDyingManager.getDying()));
         }
     }
 }

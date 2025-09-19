@@ -6,22 +6,22 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Boat;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.entity.EntityMountEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.a1kari8.mc.lastbreath.LastBreath;
 import org.a1kari8.mc.lastbreath.ServerConfig;
 import org.a1kari8.mc.lastbreath.ServerDyingManager;
@@ -83,6 +83,7 @@ public class DeathEventHandler {
         serverPlayer.setForcedPose(null);
         serverPlayer.setData(LastBreath.DYING, false);
         serverPlayer.setData(LastBreath.BLEEDING, false);
+        serverPlayer.setInvulnerable(false);
         PacketDistributor.sendToPlayer(serverPlayer, new DyingStatePayload(false));
         ServerDyingManager.removeDying(serverPlayer.getUUID());
     }
@@ -99,16 +100,19 @@ public class DeathEventHandler {
         player.setHealth(dyingHealth);
         AttributeInstance movementSpeed = player.getAttribute(Attributes.MOVEMENT_SPEED);
         if (movementSpeed != null) {
-//            movementSpeed.setBaseValue(ServerConfig.DYING_SPEED.getAsDouble()); // 默认是 0.1
-            System.out.println("move");
             movementSpeed.removeModifier(ResourceLocation.fromNamespaceAndPath(MOD_ID, "dying_speed_modifier"));
-            movementSpeed.addOrReplacePermanentModifier(new AttributeModifier(ResourceLocation.fromNamespaceAndPath(MOD_ID,"dying_speed_modifier"),ServerConfig.DYING_SPEED_MULTIPLE.getAsDouble() - 1.0f,AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
+            movementSpeed.addOrReplacePermanentModifier(new AttributeModifier(ResourceLocation.fromNamespaceAndPath(MOD_ID, "dying_speed_modifier"), ServerConfig.DYING_SPEED_MULTIPLE.getAsDouble() - 1.0f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
         }
         AttributeInstance maxHealth = player.getAttribute(Attributes.MAX_HEALTH);
         if (maxHealth != null) {
             maxHealth.setBaseValue(ServerConfig.DYING_MAX_HEALTH.getAsDouble()); // 默认是 20.0
         }
         ServerDyingManager.addDying(player.getUUID());
+        if (ServerLifecycleHooks.getCurrentServer() != null) {
+            ServerLifecycleHooks.getCurrentServer().getPlayerList().broadcastSystemMessage(Component.literal(player.getName().getString() + "倒地了"), false);
+        }
+        player.setInvulnerable(ServerConfig.DYING_INVULNERABLE.getAsBoolean());
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 40, 254, false, false));
     }
 
     @SubscribeEvent

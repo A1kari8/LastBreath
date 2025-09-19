@@ -10,5 +10,6 @@
   "lastbreath.config.dying_health": "进入濒死状态时生命值",
   "lastbreath.config.dying_max_health": "濒死状态时生命值上限",
   "lastbreath.config.rescue_health": "被救起后的生命值",
-  "lastbreath.config.dying_speed": "濒死移动速度"
+  "lastbreath.config.dying_speed": "濒死移动速度",
+  "lastbreath.config.dying_invulnerable": "濒死时免疫伤害"
 }

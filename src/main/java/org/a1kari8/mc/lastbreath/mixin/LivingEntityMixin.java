@@ -2,10 +2,8 @@ package org.a1kari8.mc.lastbreath.mixin;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.Vec3;
 import org.a1kari8.mc.lastbreath.LastBreath;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
@@ -17,8 +15,8 @@ public class LivingEntityMixin {
             name = "f4"
     )
     private float modifyWaterSpeed(float value) {
-        if ((Object)this instanceof Player player) {
-            if (player.getData(LastBreath.DYING)){
+        if ((Object) this instanceof Player player) {
+            if (player.getData(LastBreath.DYING)) {
                 return 0.2f;
             }
         }
