@@ -15,7 +15,7 @@ public record DyingListPayload(List<UUID> dyingList) implements CustomPacketPayl
     public static final Type<DyingListPayload> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(LastBreath.MOD_ID, "dying_list"));
 
-        public static final StreamCodec<FriendlyByteBuf, List<UUID>> DYING_LIST_CODEC = new StreamCodec<>() {
+    public static final StreamCodec<FriendlyByteBuf, List<UUID>> DYING_LIST_CODEC = new StreamCodec<>() {
         @Override
         public @NotNull List<UUID> decode(@NotNull FriendlyByteBuf buf) {
             int size = buf.readShort();

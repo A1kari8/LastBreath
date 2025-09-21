@@ -1,6 +1,7 @@
 package org.a1kari8.mc.lastbreath.network.payload;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -25,19 +26,19 @@ public record RescueStatePayload(RescueState rescueState) implements CustomPacke
 //        }
 //    };
 
-    public static final StreamCodec<ByteBuf, RescueState> STATE_CODEC = new StreamCodec<>() {
+    public static final StreamCodec<FriendlyByteBuf, RescueState> STATE_CODEC = new StreamCodec<>() {
         @Override
-        public @NotNull RescueState decode(@NotNull ByteBuf buf) {
-            return RescueState.values()[buf.readByte()];
+        public @NotNull RescueState decode(@NotNull FriendlyByteBuf buf) {
+            return buf.readEnum(RescueState.class);
         }
 
         @Override
-        public void encode(@NotNull ByteBuf buf, @NotNull RescueState rescueState) {
-            buf.writeByte(rescueState.ordinal());
+        public void encode(@NotNull FriendlyByteBuf buf, @NotNull RescueState rescueState) {
+            buf.writeEnum(rescueState);
         }
     };
 
-    public static final StreamCodec<ByteBuf, RescueStatePayload> CODEC =
+    public static final StreamCodec<FriendlyByteBuf, RescueStatePayload> CODEC =
             StreamCodec.composite(
 //                    UUID_CODEC, RescueProgressPayload::playerId,
 //                    ByteBufCodecs.FLOAT, RescueProgressPayload::progress,
