@@ -12,5 +12,7 @@
   "lastbreath.config.rescue_health": "Health value after a player is rescued",
   "lastbreath.config.dying_speed": "Dying speed multiple",
   "lastbreath.config.dying_invulnerable": "Dying invulnerable",
-  "lastbreath.config.dying_can_be_seen_as_enemy": "Dying player can be seen as enemy"
+  "lastbreath.config.dying_can_be_seen_as_enemy": "Dying player can be seen as enemy",
+  "lastbreath.config.dying_tp_safe_pos": "Teleport dying player to safe position",
+  "lastbreath.config.dying_tp_safe_pos_search_radius": "Search radius for safe position teleporting"
 }

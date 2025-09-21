@@ -1,10 +1,8 @@
 {
   "itemGroup.lastbreath": "Last Breath",
-
   "lastbreath.configuration.title": "LastBreath Configs",
   "lastbreath.configuration.section.lastbreath.common.toml": "LastBreath Configs",
   "lastbreath.configuration.section.lastbreath.common.toml.title": "LastBreath Configs",
-
   "lastbreath.config.rescue_duration": "救援所需时间（毫秒）",
   "lastbreath.config.bleeding_duration": "直到死亡的流血持续时间（秒）（-1表示不流血）",
   "lastbreath.config.dying_health": "进入濒死状态时生命值",
@@ -12,5 +10,7 @@
   "lastbreath.config.rescue_health": "被救起后的生命值",
   "lastbreath.config.dying_speed": "濒死移动速度倍率",
   "lastbreath.config.dying_invulnerable": "濒死时免疫伤害",
-  "lastbreath.config.dying_can_be_seen_as_enemy": "濒死玩家可被敌人攻击"
+  "lastbreath.config.dying_can_be_seen_as_enemy": "濒死玩家可被敌人攻击",
+  "lastbreath.config.dying_tp_safe_pos": "传送濒死玩家到安全位置",
+  "lastbreath.config.dying_tp_safe_pos_search_radius": "传送到安全位置的搜索半径"
 }

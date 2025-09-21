@@ -5,44 +5,22 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public class ServerConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    public static final ModConfigSpec.IntValue RESCUE_DURATION_MILLISECOND = BUILDER
-            .comment("Duration in millisecond for the rescue action")
-            .translation("lastbreath.config.rescue_duration")
-            .defineInRange("rescueDuration", 9000, 1, Short.MAX_VALUE);
+    public static final ModConfigSpec.IntValue RESCUE_DURATION_MILLISECOND = BUILDER.comment("Duration in millisecond for the rescue action").translation("lastbreath.config.rescue_duration").defineInRange("rescueDuration", 9000, 1, Short.MAX_VALUE);
 
-    public static final ModConfigSpec.IntValue BLEEDING_DURATION = BUILDER
-            .comment("Duration in second for the bleeding until death (-1 means no bleeding)")
-            .translation("lastbreath.config.bleeding_duration")
-            .defineInRange("bleedingDuration", -1, -1, Short.MAX_VALUE);
+    public static final ModConfigSpec.IntValue BLEEDING_DURATION = BUILDER.comment("Duration in second for the bleeding until death (-1 means no bleeding)").translation("lastbreath.config.bleeding_duration").defineInRange("bleedingDuration", -1, -1, Short.MAX_VALUE);
 
-    public static final ModConfigSpec.DoubleValue DYING_HEALTH = BUILDER
-            .comment("Health value when a player enters dying state")
-            .translation("lastbreath.config.dying_health")
-            .defineInRange("dyingHealth", 10.0, 1.0, 20.0);
+    public static final ModConfigSpec.DoubleValue DYING_HEALTH = BUILDER.comment("Health value when a player enters dying state").translation("lastbreath.config.dying_health").defineInRange("dyingHealth", 10.0, 1.0, 20.0);
 
-    public static final ModConfigSpec.DoubleValue DYING_MAX_HEALTH = BUILDER
-            .comment("Max health when a player is dying state")
-            .translation("lastbreath.config.dying_max_health")
-            .defineInRange("dyingMaxHealth", 10.0, 1.0, 20.0);
+    public static final ModConfigSpec.DoubleValue DYING_MAX_HEALTH = BUILDER.comment("Max health when a player is dying state").translation("lastbreath.config.dying_max_health").defineInRange("dyingMaxHealth", 10.0, 1.0, 20.0);
 
-    public static final ModConfigSpec.DoubleValue RESCUE_HEALTH = BUILDER
-            .comment("Health value after a player is rescued")
-            .translation("lastbreath.config.rescue_health")
-            .defineInRange("rescueHealth", 6.0, 1.0, 20.0);
+    public static final ModConfigSpec.DoubleValue RESCUE_HEALTH = BUILDER.comment("Health value after a player is rescued").translation("lastbreath.config.rescue_health").defineInRange("rescueHealth", 6.0, 1.0, 20.0);
 
-    public static final ModConfigSpec.DoubleValue DYING_SPEED_MULTIPLE = BUILDER
-            .comment("Dying speed multiple")
-            .translation("lastbreath.config.dying_speed")
-            .defineInRange("dyingSpeed", 0.4, 0.01, 1.0);
+    public static final ModConfigSpec.DoubleValue DYING_SPEED_MULTIPLE = BUILDER.comment("Dying speed multiple").translation("lastbreath.config.dying_speed").defineInRange("dyingSpeed", 0.4, 0.01, 1.0);
 
-    public static final ModConfigSpec.BooleanValue DYING_INVULNERABLE = BUILDER
-            .comment("Dying invulnerable")
-            .translation("lastbreath.config.dying_invulnerable")
-            .define("dyingInvulnerable", false);
-    public static final ModConfigSpec.BooleanValue DYING_CAN_BE_SEEN_AS_ENEMY = BUILDER
-            .comment("Dying player can be seen as enemy")
-            .translation("lastbreath.config.dying_can_be_seen_as_enemy")
-            .define("dyingCanBeSeenAsEnemy", false);
+    public static final ModConfigSpec.BooleanValue DYING_INVULNERABLE = BUILDER.comment("Dying invulnerable").translation("lastbreath.config.dying_invulnerable").define("dyingInvulnerable", false);
+    public static final ModConfigSpec.BooleanValue DYING_CAN_BE_SEEN_AS_ENEMY = BUILDER.comment("Dying player can be seen as enemy").translation("lastbreath.config.dying_can_be_seen_as_enemy").define("dyingCanBeSeenAsEnemy", false);
+    public static final ModConfigSpec.BooleanValue DYING_TP_SAFE_POS = BUILDER.comment("Teleport dying player to safe position").translation("lastbreath.config.dying_tp_safe_pos").define("dyingTpSafePos", true);
+    public static final ModConfigSpec.IntValue DYING_TP_SAFE_POS_SEARCH_RADIUS = BUILDER.comment("Search radius for safe position teleporting").translation("lastbreath.config.dying_tp_safe_pos_search_radius").defineInRange("dyingTpSafePosSearchRadius", 128, 1, Short.MAX_VALUE);
 
     // 该条必须放在最后
     public static final ModConfigSpec SPEC = BUILDER.build();
