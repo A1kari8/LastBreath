@@ -1,10 +1,8 @@
 package org.a1kari8.mc.lastbreath.event;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ProjectileWeaponItem;
-import net.minecraft.world.item.TridentItem;
+import net.minecraft.world.item.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
@@ -34,6 +32,13 @@ public class PlayerAttackEventHandler {
     public static void onRightClick(PlayerInteractEvent.RightClickItem event) {
         if (event.getEntity().getData(LastBreath.DYING)) {
             ItemStack stack = event.getItemStack();
+            if (stack.getItem() instanceof CrossbowItem) {
+                var chargedProjectiles = stack.get(DataComponents.CHARGED_PROJECTILES);
+                if (chargedProjectiles != null && !chargedProjectiles.isEmpty()) {
+                    return;
+                }
+                event.setCanceled(true);
+            }
             if (isRangedWeapon(stack)) {
                 event.setCanceled(true);
             }
